@@ -22,13 +22,14 @@ From the Realsense camera:
 
 # import the necessary packages
 from Arduino import Arduino
-from Realsense_derek import *
+# from Realsense_derek import *
 # from RealSense import *
 import numpy as np
 # import imutils
 import cv2 as cv
 import controller	# For driving and steering
 import random
+import networking
 
 try:
     print("Init Car")
@@ -50,6 +51,10 @@ try:
     k_p = 0.8   # increase until oscillation, then half
     k_d = 0.4   # increase until minimal oscillation
 
+
+    # create socket to get turn commands
+    car_sock = networking.create_car_command_server_socket("10.37.0.5", 12345)
+    input_gen = networking.car_input_receive_generator(car_sock) # generator to get info from socket
 
     start_key = ''
     print("### Press spacebar then enter to start! ###")
@@ -78,10 +83,10 @@ try:
         return control, val
 
 
-    while True:
+    for data in input_gen: # keep looping until the socket closes
         counter += 1        
 
-        control, val = parse_string(string_generator())
+        control, val = parse_string(data)
         if control == 'SPD':
             Car.drive(val)
         if control == 'DIR':
@@ -95,6 +100,6 @@ except Exception as e:
 finally:       
     print("Deleting Car")
     if Car is not None:
-    	Car.drive(0)
-    	del Car
+        Car.drive(0)
+        del Car
 
