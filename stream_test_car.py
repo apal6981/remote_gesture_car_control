@@ -18,9 +18,9 @@ frameIndex = 0
 while True:
     (frame_time, rgb, depth, accel, gyro) = rs.getData()
     gray = cv.cvtColor(rgb, cv.COLOR_BGR2GRAY)
-    # resize = cv.resize(rgb,(320,240), interpolation = cv.INTER_AREA)
+    resize = cv.resize(gray,(320,240), interpolation = cv.INTER_AREA)
     # print("gray shape",gray.shape)
-    npSocket.send(gray)
+    npSocket.send(resize)
     # print("sent:",frameIndex)
     frameIndex += 1
 
