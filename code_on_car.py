@@ -27,7 +27,7 @@ from Arduino import Arduino
 import numpy as np
 # import imutils
 import cv2 as cv
-import controller	# For driving and steering
+#import controller	# For driving and steering
 import random
 import networking
 
