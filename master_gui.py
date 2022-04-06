@@ -6,6 +6,10 @@ from tkinter import Tk, Frame, Button, BOTH, Label, Scale, Radiobutton, StringVa
 from tkinter import font as tkFont
 import tkinter as tk
 
+import networking
+from numpysocket import NumpySocket
+import socket
+
 camera = cv.VideoCapture(0)
 width = int(camera.get(cv.CAP_PROP_FRAME_WIDTH))
 height = int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -33,14 +37,18 @@ class App(Frame):
 
         # self.pack(fill=BOTH, expand=1)
 
-        ret0, frame = camera.read()
+        # ret0, frame = camera.read()
+        frame = cv.imread("real_sense.jpg")
+        frame = cv.resize(frame, (640,480))
         image = cvMat2tkImg(frame)
         self.stream_panel = Label(image=image)
         self.stream_panel.image = image
         self.stream_panel.grid(column=0, row=0,columnspan=2)
 
         # capture and display the first frame
-        ret0, frame = camera.read()
+        # ret0, frame = camera.read()
+        frame = cv.imread("steering_wheel.jpg")
+        frame = cv.resize(frame, (640,480))
         image = cvMat2tkImg(frame)
         self.panel = Label(image=image)
         self.panel.image = image
@@ -56,17 +64,53 @@ class App(Frame):
         self.speed_label = Label(textvariable=self.speed_var)
         self.speed_label.grid(column=1,row=1,sticky='e',columnspan=2)
 
-        self.btnStream = Button(text="Start Streaming",command=self.stream_start)
+        self.btnStream = Button(text="Start Stream",command=self.stream_start)
         self.btnStream['font']= helv18
         self.btnStream.grid(column=0,row=1, sticky="w")
 
+        self.stream_sock = None
+        self.streaming = False
+
         # threading
         self.stopevent = threading.Event()
+
         self.thread = threading.Thread(target=self.capture, args=())
         self.thread.start()
 
+        self.stream_thread = threading.Thread(target=self.stream_capture, args=())
+        self.stream_thread.start()
+
+        
+
+    def stream_capture(self):
+        while not self.stopevent.is_set():
+            if self.streaming:
+                stream_frame = self.stream_sock.recieve()
+                image = cvMat2tkImg(stream_frame)
+                self.stream_panel.configure(image=image)
+                self.stream_panel.image = image
+
     def stream_start(self):
-        pass
+        if self.stream_sock is None:
+            try:
+                self.stream_sock = NumpySocket()
+                self.stream_sock.startClient("10.37.0.5", 9999)
+                self.btnStream.config(text="Stop Stream")
+                self.btnStream.config(bg='green')
+                self.streaming = True
+                # self.root.update()
+            except socket.error:
+                self.stream_sock.close()
+                self.stream_sock = None
+                self.btnStream.config(bg='red')
+                print("error connecting to stream")
+                # self.root.update()
+        else:
+            self.btnStream.config(text="Start Stream")
+            self.btnStream.config(bg="")
+            self.stream_sock.close()
+        self.root.update()
+
 
     def startstop(self):        #toggle flag to start and stop
         if self.btnStart.config('text')[-1] == 'Start Motion':

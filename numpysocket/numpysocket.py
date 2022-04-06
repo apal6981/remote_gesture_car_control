@@ -21,7 +21,8 @@ class NumpySocket():
         except (AttributeError, OSError):
             pass
         except Exception as e:
-            logging.error("error when deleting socket", e)
+            pass
+            # logging.error("error when deleting socket", e)
 
         self.close()
 
@@ -32,18 +33,19 @@ class NumpySocket():
         self.socket.bind((self.address, self.port))
         self.socket.listen(1)
         
-        logging.debug("waiting for a connection")
+        # logging.debug("waiting for a connection")
         self.client_connection, self.client_address = self.socket.accept()
-        logging.debug("connected to:", self.client_address[0])
+        # logging.debug("connected to:", self.client_address[0])
 
     def startClient(self, address, port):
         self.address = address
         self.port = port
         try:
+            self.socket.settimeout(5.0)
             self.socket.connect((self.address, self.port))
-            logging.debug("Connected to", self.address, "on port", self.port)
+            # logging.debug("Connected to", self.address, "on port", self.port)
         except socket.error as err:
-            logging.error("Connection to", self.address, "on port", self.port, "failed")
+            # logging.error("Connection to", self.address, "on port", self.port, "failed")
             raise
 
     def close(self):
@@ -86,7 +88,7 @@ class NumpySocket():
             logging.error("connection broken")
             raise
 
-        logging.debug("frame sent")
+        # logging.debug("frame sent")
 
 
     def recieve(self, socket_buffer_size=1024):
@@ -118,5 +120,5 @@ class NumpySocket():
                 break
         
         frame = np.load(BytesIO(frameBuffer))['frame']
-        logging.debug("frame received")
+        # logging.debug("frame received")
         return frame

@@ -22,7 +22,7 @@ def car_input_receive_generator(sock):
 
 def create_car_controller_socket(car_IP, car_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    return socket.create_connection((car_IP, car_port))
+    return socket.create_connection((car_IP, car_port),timeout=1.0)
 
 
 def send_car_drive_info(sock, speed):
