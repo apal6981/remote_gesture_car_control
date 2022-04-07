@@ -6,15 +6,18 @@ from numpysocket import NumpySocket
 
 host_ip = '10.32.120.58'  # change me
 
-npSocket = None
-npSocket = NumpySocket()
-npSocket.startClient(host_ip, 9999)
+
 
 rs = None
 rs = RealSense("/dev/video2", RS_VGA)    # RS_VGA, RS_720P, or RS_1080P
 writer = None
 recording = False
 frameIndex = 0
+
+npSocket = None
+npSocket = NumpySocket()
+npSocket.startServer(host_ip, 9999)
+
 while True:
     (frame_time, rgb, depth, accel, gyro) = rs.getData()
     gray = cv.cvtColor(rgb, cv.COLOR_BGR2GRAY)
