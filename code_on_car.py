@@ -54,12 +54,12 @@ try:
 
     # create socket to get turn commands
     car_sock = networking.create_car_command_server_socket("10.37.0.5", 12345)
-    input_gen = networking.car_input_receive_generator(car_sock) # generator to get info from socket
+    # input_gen = networking.car_input_receive_generator(car_sock) # generator to get info from socket
 
-    start_key = ''
-    print("### Press spacebar then enter to start! ###")
-    while start_key != ' ':
-        start_key = input()
+    # start_key = ''
+    # print("### Press spacebar then enter to start! ###")
+    # while start_key != ' ':
+    #     start_key = input()
 
     def string_generator():
         choice = random.randint(0,1)
@@ -82,15 +82,19 @@ try:
         val = float(x[1])
         return control, val
 
+    while True:
+        print("trying to initalize connection")
+        Car.drive(0)
+        input_gen = networking.car_input_receive_generator(car_sock)
 
-    for data in input_gen: # keep looping until the socket closes
-        counter += 1        
+        for data in input_gen: # keep looping until the socket closes
+            counter += 1        
 
-        control, val = parse_string(data)
-        if control == 'SPD':
-            Car.drive(val)
-        if control == 'DIR':
-            Car.steer(val)
+            control, val = parse_string(data)
+            if control == 'SPD':
+                Car.drive(val)
+            if control == 'DIR':
+                Car.steer(val)
 
 		
 except Exception as e:

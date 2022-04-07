@@ -2,8 +2,10 @@
 
 import socket
 import logging
+from tkinter import N
 import numpy as np
 from io import BytesIO
+import cv2 as cv
 
 
 class NumpySocket():
@@ -41,7 +43,7 @@ class NumpySocket():
         self.address = address
         self.port = port
         try:
-            self.socket.settimeout(5.0)
+            # self.socket.settimeout(5.0)
             self.socket.connect((self.address, self.port))
             # logging.debug("Connected to", self.address, "on port", self.port)
         except socket.error as err:
@@ -89,6 +91,17 @@ class NumpySocket():
             raise
 
         # logging.debug("frame sent")
+
+    def send2(self,frame):
+        b_img = cv.imencode(".jpg" , frame)[1].tobytes() # first encode and then convert to bytes
+        self.socket.sendall(b_img)   
+
+    def receive2(self):
+        mess = self.client_connection.recv(100000)                        #recieve 1 lack bytes of data
+        if (mess):
+            nparr = np.frombuffer(mess, np.uint8)  # retreive the array form bytes
+            return cv.imdecode(nparr, cv.IMREAD_COLOR) # create image from array
+        return None
 
 
     def recieve(self, socket_buffer_size=1024):

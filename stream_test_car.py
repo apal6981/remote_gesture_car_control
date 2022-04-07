@@ -4,7 +4,7 @@ import cv2 as cv
 from numpysocket import NumpySocket
 
 
-host_ip = '10.32.120.58'  # change me
+host_ip = '10.32.120.54'  # change me
 
 
 
@@ -16,15 +16,17 @@ frameIndex = 0
 
 npSocket = None
 npSocket = NumpySocket()
-npSocket.startServer(9999)
+print("created socket")
+npSocket.startClient(host_ip, 9999)
+print("server started")
 
 while True:
     (frame_time, rgb, depth, accel, gyro) = rs.getData()
     gray = cv.cvtColor(rgb, cv.COLOR_BGR2GRAY)
-    resize = cv.resize(gray,(320,240), interpolation = cv.INTER_AREA)
+    resize = cv.resize(gray,(640,480), interpolation = cv.INTER_AREA)
     # print("gray shape",gray.shape)
-    npSocket.send(resize)
-    # print("sent:",frameIndex)
+    npSocket.send2(resize)
+    print("sent:",frameIndex)
     frameIndex += 1
 
     # if writer is None and recording is True:

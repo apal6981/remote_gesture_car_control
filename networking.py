@@ -1,8 +1,10 @@
+from distutils.log import error
 import socket
 
 
 def create_car_command_server_socket(car_IP, car_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((car_IP, car_port))
     return sock
 
@@ -13,7 +15,10 @@ def car_input_receive_generator(sock):
     with conn:
         print("connection started")
         while True:
-            data = conn.recv(8)
+            try:
+                data = conn.recv(8)
+            except socket.error:
+                break
             if not data:
                 print("connection closed")
                 break
