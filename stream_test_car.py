@@ -16,7 +16,7 @@ frameIndex = 0
 
 npSocket = None
 npSocket = NumpySocket()
-npSocket.startServer(host_ip, 9999)
+npSocket.startServer(9999)
 
 while True:
     (frame_time, rgb, depth, accel, gyro) = rs.getData()
